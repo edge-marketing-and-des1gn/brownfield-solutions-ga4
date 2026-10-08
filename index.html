@@ -56,6 +56,9 @@
     display:flex;flex-direction:column;}
   .brand{padding:0 24px 26px;}
   .brand-mark{display:block;margin-bottom:16px;}
+  .brand-logo{display:block;width:auto;height:auto;max-width:188px;max-height:68px;margin-bottom:12px;}
+  .brand-logo[hidden]{display:none;}
+  .brand.has-logo .brand-mark,.brand.has-logo .client{display:none;}
   .client{font-family:var(--serif);font-size:21px;line-height:1.2;font-weight:500;color:#fff;letter-spacing:-.005em;}
   .site{display:inline-block;margin-top:4px;font-size:13px;color:var(--rail-ink-2);text-decoration:none;word-break:break-all;}
   .site:hover{color:#fff;text-decoration:underline;}
@@ -269,6 +272,7 @@
     .rail{position:sticky;top:0;z-index:20;height:auto;min-width:0;padding:14px 0 10px;}
     .brand{padding:0 16px 10px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
     .brand-mark{display:none;}
+    .brand-logo{max-height:30px;max-width:150px;margin-bottom:0;align-self:center;}
     .client{font-size:18px;}
     .site{margin-top:0;}
     .tabs{flex-direction:row;overflow-x:auto;padding:0 10px;scrollbar-width:none;}
@@ -316,6 +320,7 @@
         <rect x="0" y="12" width="34" height="13" rx="3" fill="#C89A45"/>
         <rect x="0" y="27" width="34" height="7" rx="3" fill="#7690AC"/>
       </svg>
+      <img class="brand-logo" id="brandLogo" alt="" hidden>
       <div class="client" id="clientName"></div>
       <a class="site" id="siteLink" target="_blank" rel="noopener"></a>
     </div>
@@ -395,11 +400,14 @@
 const CONFIG = {
   // The Apps Script web app URL ending in /exec. Leave empty to see
   // the dashboard with demo numbers.
-  feedUrl: '',
+  feedUrl: 'https://script.google.com/macros/s/AKfycbxh7ZeCWNwL7cr5P4gng2bu6kYz3TOPN9SjabBQeVYQRXhGmnyo-qUM-NxuzJUTYM63xw/exec',
   clientName: 'Brownfield Solutions Ltd.',
+  // A white or light logo, shown on the dark sidebar. Leave empty to
+  // show the client name in type instead.
+  logoUrl: 'https://www.brownfieldsolutions.ca/application/files/5716/8314/1694/bfs--logo_white_1.png',
   // The live website, used for the address under the name and to link
   // each page. Leave empty to hide both.
-  siteUrl: '',
+  siteUrl: 'https://www.brownfieldsolutions.ca',
   // How the site is referred to in sentences.
   siteNoun: 'your website',
   footer: 'Prepared by EDGE Marketing. Figures from Google Analytics 4.',
@@ -1603,6 +1611,15 @@ function demoRealtime(){
    START
 ========================================================= */
 $('#clientName').textContent = CONFIG.clientName;
+// The logo replaces the name once it has loaded. If it can't be
+// fetched, the name and the strata mark stay.
+if (CONFIG.logoUrl){
+  const logo = $('#brandLogo');
+  logo.alt = CONFIG.clientName;
+  logo.addEventListener('load', () => { logo.hidden = false; $('.brand').classList.add('has-logo'); });
+  logo.addEventListener('error', () => logo.remove());
+  logo.src = CONFIG.logoUrl;
+}
 document.title = CONFIG.clientName + ' website traffic';
 $('#railFoot').textContent = CONFIG.footer;
 if (CONFIG.siteUrl){
